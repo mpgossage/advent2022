@@ -8,9 +8,9 @@ def load_lines(fname):
         return [l.strip("\n") for l in f.readlines()]
 
 
-def load_tokens(fname):
+def load_tokens(fname, sep=None):
     with open(fname) as f:
-        return [l.strip("\n").split() for l in f.readlines()]
+        return [l.strip("\n").split(sep) for l in f.readlines()]
 
 
 ##################
@@ -22,3 +22,11 @@ def test_load_tokens():
     assert len(arr[0]) == 2
     assert arr[0][0] == "A"
     assert arr[0][1] == "Y"
+
+
+def test_load_tokens_with_sep():
+    arr = load_tokens("test04.txt", ",")
+    assert len(arr) == 6
+    assert len(arr[0]) == 2
+    assert arr[0][0] == "2-4"
+    assert arr[0][1] == "6-8"
