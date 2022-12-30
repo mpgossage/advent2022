@@ -3,6 +3,11 @@ Advent of Code 2022: helpers
 """
 
 
+def load_file(fname):
+    with open(fname) as f:
+        return f.read()
+
+
 def load_lines(fname):
     with open(fname) as f:
         return [l.strip("\n") for l in f.readlines()]
