@@ -28,6 +28,31 @@ def load_int_grid(fname):
     return grid
 
 
+# extra routines for a continual line set
+# format is [(a,b)...] which shows the range a..b
+def remove_set(data, rem_start, rem_end):
+    "removes rem_st..rem_end from set"
+    # simple version: using move/pop
+    result = []
+    while data:
+        start, end = data.pop(-1)
+        if start > rem_end or end < rem_start:
+            # not touching, move over
+            result.append((start, end))
+        elif rem_start <= start and rem_end < end:
+            # removing the lower section
+            result.append((rem_end + 1, end))
+        elif rem_end >= end and rem_start > start:
+            # removing the upper section
+            result.append((start, rem_start - 1))
+        elif rem_start > start and rem_end < end:
+            # complex one, its inside the range
+            result.append((start, rem_start - 1))
+            result.append((rem_end + 1, end))
+        # else start..end is full inside & we discard
+    return result
+
+
 ##################
 
 
@@ -57,3 +82,28 @@ def test_load_int_grid():
     assert grid[2][2] == 3
     assert grid[4][0] == 3
     assert grid[4][4] == 0
+
+
+def test_remove_set():
+    data = [(0, 100)]
+    assert data == [(0, 100)]
+    # remove outside: nothing changed
+    data = remove_set(data, -10, -1)
+    data = remove_set(data, 101, 200)
+    assert data == [(0, 100)]
+    # remove lower:
+    data = remove_set(data, -10, 10)
+    assert data == [(11, 100)]
+    # remove upper
+    data = remove_set(data, 90, 200)
+    assert data == [(11, 89)]
+    # remove middle
+    data = remove_set(data, 50, 60)
+    assert data == [(11, 49), (61, 89)]
+    # now a few more bits (using set to ignore the order)
+    data = remove_set(data, 20, 30)
+    assert set(data) == set([(11, 19), (31, 49), (61, 89)])
+    data = remove_set(data, 60, 70)
+    assert set(data) == set([(11, 19), (31, 49), (71, 89)])
+    data = remove_set(data, 20, 70)
+    assert set(data) == set([(11, 19), (71, 89)])
